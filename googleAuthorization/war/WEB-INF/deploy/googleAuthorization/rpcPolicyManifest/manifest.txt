@@ -1,0 +1,3 @@
+# Module googleAuthorization
+# RPC service class, partial path of RPC policy file
+jp.leopanda.googleAuthorization.client.OAuthRpc, D6272BF3C736F2D99859D9BE9088116F.gwt.rpc

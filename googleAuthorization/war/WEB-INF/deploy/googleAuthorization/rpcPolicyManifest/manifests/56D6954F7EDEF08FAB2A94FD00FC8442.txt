@@ -1,0 +1,2 @@
+serviceClass: jp.leopanda.googleAuthorization.client.OAuthRpc
+path: D6272BF3C736F2D99859D9BE9088116F.gwt.rpc
