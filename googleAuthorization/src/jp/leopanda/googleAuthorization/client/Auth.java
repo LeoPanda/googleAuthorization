@@ -13,7 +13,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * 
  * <pre>
  * １）web.xmlに以下のセクションを追加
- * <servlet>
+  <servlet>
     <servlet-name>OAuthRpcImpl</servlet-name>
     <servlet-class>jp.leopanda.googleAuthorization.server.OAuthRpcImpl</servlet-class>
   </servlet>
@@ -123,8 +123,8 @@ public abstract class Auth {
   }
 
   private void onException(Throwable caught) {
-    if (caught instanceof NoCredential) {
-      Window.Location.replace(((NoCredential) caught).getRollbackUrl());
+    if (caught instanceof NoCredentialException) {
+      Window.Location.replace(((NoCredentialException) caught).getRollbackUrl());
     } else {
       onError(caught);
     }

@@ -11,8 +11,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("oauth")
 public interface OAuthRpc extends RemoteService {
 
-  String getAuthToken() throws  IOException, NoCredential;
-  String getAuthTokenByScopes(Collection<String> scopes) throws  IOException, NoCredential;
+  String getAuthToken() throws  IOException, NoCredentialException;
+  String getAuthTokenByScopes(Collection<String> scopes) throws  IOException, NoCredentialException;
 
 
 }

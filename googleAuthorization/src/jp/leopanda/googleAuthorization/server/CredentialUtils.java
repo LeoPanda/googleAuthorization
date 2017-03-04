@@ -14,7 +14,7 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.Preconditions;
+import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.utils.SystemProperty;
 
@@ -26,10 +26,8 @@ import javax.servlet.http.HttpServletRequest;
  * @author LeoPanda
  *
  */
-public class Utils {
+public class CredentialUtils {
 
-  private static final AppEngineDataStoreFactory DATA_STORE_FACTORY = AppEngineDataStoreFactory
-      .getDefaultInstance();
   public final HttpTransport HTTP_TRANSPORT = new UrlFetchTransport();
   public final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
@@ -45,10 +43,6 @@ public class Utils {
     if (Statics.clientSecrets == null) {
       Statics.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
           new InputStreamReader(new FileInputStream(new File("WEB-INF/client_secrets.json"))));
-      Preconditions
-          .checkArgument(!Statics.clientSecrets.getDetails().getClientId().startsWith("Enter ")
-              && !Statics.clientSecrets.getDetails().getClientSecret().startsWith("Enter "),
-              "Download client_secrets.json file");
     }
     return Statics.clientSecrets;
   }
@@ -61,9 +55,23 @@ public class Utils {
    */
   public GoogleAuthorizationCodeFlow getFlow() throws IOException {
     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT,
-          JSON_FACTORY, getClientSecrets(), Statics.scopes).setDataStoreFactory(DATA_STORE_FACTORY)
-              .setAccessType("offline").build(); 
+        JSON_FACTORY, getClientSecrets(), Statics.scopes)
+            .setDataStoreFactory(AppEngineDataStoreFactory
+                .getDefaultInstance())
+            .setAccessType("offline").build();
     return flow;
+  }
+
+  /**
+   * ストアされた認証データを削除する
+   * 
+   * @throws IOException
+   */
+  public void removeCredentialStore() throws IOException {
+    GoogleAuthorizationCodeFlow flow = getFlow();
+    if (flow != null) {
+      flow.getCredentialDataStore().delete(getCurrentUserId());
+    }
   }
 
   /**
@@ -87,7 +95,7 @@ public class Utils {
    */
   public Credential loadCredential() throws IOException {
     Credential credential = getFlow()
-        .loadCredential(UserServiceFactory.getUserService().getCurrentUser().getUserId());
+        .loadCredential(getCurrentUserId());
     return credential;
   }
 
@@ -100,6 +108,16 @@ public class Utils {
   public String getAuthUrl() throws IOException {
     String url = getFlow().newAuthorizationUrl().setRedirectUri(getCallbackUrl()).build();
     return url;
+  }
+
+  /**
+   * カレントのユーザーIDを取得する
+   * 
+   * @return
+   */
+  private String getCurrentUserId() {
+    User user = UserServiceFactory.getUserService().getCurrentUser();
+    return user.getUserId();
   }
 
   /**

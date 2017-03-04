@@ -7,7 +7,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.plus.PlusScopes;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
-import jp.leopanda.googleAuthorization.client.NoCredential;
+import jp.leopanda.googleAuthorization.client.NoCredentialException;
 import jp.leopanda.googleAuthorization.client.OAuthRpc;
 
 /**
@@ -20,23 +20,24 @@ public class OAuthRpcImpl extends RemoteServiceServlet implements OAuthRpc {
   private static final long serialVersionUID = 1L;
 
   /* 
-   * API認証を取得して認証トークンを返す（PLUS_MEスコープ限定）
+   * API認証を取得して認証トークンを返す（デフォルトスコープ）
    */
-  public String getAuthToken() throws IOException, NoCredential {
+  public String getAuthToken() throws IOException, NoCredentialException {
     Statics.addScope(PlusScopes.PLUS_ME);
-    Utils utils = new Utils();
+    Statics.addScope(PlusScopes.USERINFO_PROFILE);
+    CredentialUtils utils = new CredentialUtils();
     Credential credential = utils.loadCredential();
     if (credential != null) {
       return credential.getAccessToken();
     } else {
-      throw new NoCredential(utils.getAuthUrl());
+      throw new NoCredentialException(utils.getAuthUrl());
     }
   }
   
   /* 
    * API認証を取得して認証トークンを返す（スコープを指定）
    */
-  public String getAuthTokenByScopes(Collection<String> scopes) throws IOException, NoCredential{
+  public String getAuthTokenByScopes(Collection<String> scopes) throws IOException, NoCredentialException{
     for (String scope : scopes) {
       Statics.addScope(scope);
     }

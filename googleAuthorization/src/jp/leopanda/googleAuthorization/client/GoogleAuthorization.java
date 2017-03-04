@@ -17,7 +17,7 @@ public class GoogleAuthorization implements EntryPoint {
       
       @Override
       public void onGetToken() {
-        Window.alert(getToken());
+        Window.alert("token=" + getToken());
         
       }
     };

@@ -21,6 +21,7 @@
 		<servlet-name>OAuth2Callback</servlet-name>
 		<url-pattern>/oauth2callback</url-pattern>
 	</servlet-mapping>
+
 	<!-- security constraint -->
 	<security-constraint>
 		<web-resource-collection>

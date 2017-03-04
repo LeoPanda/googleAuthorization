@@ -41,12 +41,12 @@ public class OAuth2Callback extends AbstractAppEngineAuthorizationCodeCallbackSe
 
   @Override
   protected String getRedirectUri(HttpServletRequest req) throws ServletException, IOException {
-    return new Utils().getRedirectUri(req);
+    return new CredentialUtils().getRedirectUri(req);
   }
 
   @Override
   protected AuthorizationCodeFlow initializeFlow() throws IOException {
-    return  new Utils().getFlow();
+    return  new CredentialUtils().getFlow();
   }
 
 }

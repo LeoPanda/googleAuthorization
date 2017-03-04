@@ -9,14 +9,14 @@ import java.io.Serializable;
  *
  */
 @SuppressWarnings("serial")
-public class NoCredential extends Exception implements Serializable {
+public class NoCredentialException extends Exception implements Serializable {
   private String rollbackUrl;
 
-  public NoCredential() {
+  public NoCredentialException() {
     super();
   }
 
-  public NoCredential(String rollbackUrl) {
+  public NoCredentialException(String rollbackUrl) {
     this.rollbackUrl = rollbackUrl;
   }
 
