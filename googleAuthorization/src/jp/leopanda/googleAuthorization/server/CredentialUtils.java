@@ -203,7 +203,7 @@ public class CredentialUtils {
   private String getCallbackUrl() {
     String callbackUrl;
     if (SystemProperty.environment.get().equals("Development")) {
-      callbackUrl = "http://localhost:8080" + callbackPath;
+      callbackUrl = "http://127.0.0.1:8080" + callbackPath;
     } else {
       String version = SystemProperty.applicationVersion.get().split("\\.")[0];
       String appName = SystemProperty.applicationId.get();

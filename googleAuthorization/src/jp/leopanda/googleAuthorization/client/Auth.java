@@ -49,47 +49,37 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
   ３）AppEngine APIコンソールからWebアプリ用の認証クライアントIDとシークレットキーを作成し、jsonファイルをダウンロードする。
   ４）ダウンロードしたファイルを client_secrets.json　とリネームし、 /WEB-INF の直下に置く。
-  ５）このクラスを生成し、認証取得後の処理を onGetToken()　に記述する。
+  ５）このクラスを生成し、認証取得後の処理をonGetTokenに記述する。
+  6) getAuthTokenxxxを呼び出し認証をリクエストする。
  * 
  * </pre>
  * 
  * @author LeoPanda
  *
  */
-public abstract class Auth {
+public class Auth {
 
   private OAuthRpcAsync rpc = GWT.create(OAuthRpc.class);
   private String authToken = null;
+  private OnGetToken onGetToken; // 認証取得後の処理
 
   /**
-   * 通常コンストラクタ
-   * PLUS_MEスコープのみの認証を取得する
+   * コンストラクタ
+   * 
+   * @param onGetToken
    */
-  public Auth() {
-    rpc.getAuthToken(new AsyncCallback<String>() {
-
-      @Override
-      public void onSuccess(String result) {
-        onGoing(result);
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        onException(caught);
-      }
-    });
+  public Auth(OnGetToken onGetToken) {
+    this.onGetToken = onGetToken;
   }
 
   /**
-   * スコープを指定して認証を得るためのコンストラクタ
-   * @param scopes
+   * PLUS_MEスコープのみの認証をリクエストする
    */
-  public Auth(Collection<String> scopes) {
-    rpc.getAuthTokenByScopes(scopes, new AsyncCallback<String>() {
-
+  public Auth requestToken() {
+    rpc.getAuthToken(new AsyncCallback<String>() {
       @Override
       public void onSuccess(String result) {
-        onGoing(result);
+        onGetSuccess(result);
       }
 
       @Override
@@ -97,15 +87,32 @@ public abstract class Auth {
         onException(caught);
       }
     });
-}
-  
+    return this;
+  }
+
   /**
-   * 認証を正常取得した後の処理を記述する
+   * スコープを指定して認証をリクエストする
+   * 
+   * @param scopes
    */
-  public abstract void onGetToken();
+  public Auth requestToeknByScopes(Collection<String> scopes) {
+    rpc.getAuthTokenByScopes(scopes, new AsyncCallback<String>() {
+      @Override
+      public void onSuccess(String result) {
+        onGetSuccess(result);
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        onException(caught);
+      }
+    });
+    return this;
+  }
 
   /**
    * 認証取得に失敗した場合の処理（独自に処理を記述するにはオーバライドしてください）
+   * 
    * @param caught
    */
   public void onError(Throwable caught) {
@@ -122,6 +129,11 @@ public abstract class Auth {
     return this.authToken;
   }
 
+  /**
+   * 認証取得失敗時の処理
+   * 
+   * @param caught
+   */
   private void onException(Throwable caught) {
     if (caught instanceof NoCredentialException) {
       Window.Location.replace(((NoCredentialException) caught).getRollbackUrl());
@@ -130,9 +142,23 @@ public abstract class Auth {
     }
   }
 
-  private void onGoing(String result) {
+  /**
+   * 認証取得後の処理
+   * 
+   * @param result
+   */
+  private void onGetSuccess(String result) {
     this.authToken = result;
-    onGetToken();
+    onGetToken.apply();
   }
 
+  /**
+   * 認証取得後の処理を記述するためのインターフェース
+   * 
+   * @author LeoPanda
+   *
+   */
+  public interface OnGetToken {
+    void apply();
+  }
 }

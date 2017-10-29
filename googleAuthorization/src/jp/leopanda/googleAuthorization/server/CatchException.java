@@ -19,23 +19,15 @@ public abstract class CatchException<E> {
    * @return E 指定した戻り値
    * @throws Exception
    */
-  public E execute() throws Exception {
+  public E execute(TryApiCall<E> apiCall) throws Exception {
     E result = null;
     try {
-      result = tryApiCall();
+      result = apiCall.apply();
     } catch (Throwable e) {
       afterProcess(e);
     }
     return result;
   }
-
-  /**
-   * Auth認証を使用したAPIコールを実装する
-   * 
-   * @return
-   * @throws Exception
-   */
-  public abstract E tryApiCall() throws Exception;
 
   /**
    * 認証エラーの場合はストアされた認証を削除し認証例外を発生させる
